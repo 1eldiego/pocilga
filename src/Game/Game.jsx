@@ -74,21 +74,17 @@ class Game extends React.Component {
     this.socket.close();
   }
 
-  componentDidMount() {
-    this.socket = new WebSocket('ws://192.168.0.19:8080');
+  connectToServer() {
+    this.socket = new WebSocket(`ws://192.168.0.19:8080?id=${this.state.user.id}`);
 
-    this.socket.addEventListener('open', (event) => {
-
-    });
+    this.socket.addEventListener('open', (event) => { });
 
     this.socket.addEventListener('message', (event) => {
       const msg = JSON.parse(event.data);
 
       switch (msg.type) {
         case 'R':
-          this.registerUser(msg.payload.id);
-          msg.payload.players.map(player =>
-            this.addNewPlayer(player.id, player.position.x, player.position.y));
+          this.registerUser(msg.payload);
           break;
 
         case 'N':
@@ -107,7 +103,9 @@ class Game extends React.Component {
           break;
       }
     });
+  }
 
+  componentDidMount() {
     window.addEventListener("beforeunload", () => this.exitPlayer());
 
     const gameDom = this.gameRef.current;
@@ -131,7 +129,14 @@ class Game extends React.Component {
           />
         ))}
 
-        ID: {this.state.user.id}
+        <input onChange={event => this.setState({
+          user: {
+            id: event.target.value,
+          }
+        })} />
+        <button onClick={() => this.connectToServer()}>
+          Login
+        </button>
       </section>
     );
   }
