@@ -1,0 +1,34 @@
+.player {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player__body {
+  width: 5vh;
+  height: 5vh;
+  background-color: #EEE;
+  border-radius: 5vh;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0.9vh 1.1vh;
+  border: 0.4vh solid #111;
+}
+
+.player__eye {
+  background-color: #111;
+  height: 1.7vh;
+  width: 0.7vh;
+  border-radius: 15px;
+}
+
+.player__indicator {
+  background: rgb(0, 238, 255);
+  box-shadow: 0 0 8px rgba(0, 238, 255, 0.651);
+  width: 2.5vh;
+  height: 0.1vh;
+  border-radius: 30px;
+  margin-top: 0.5vh;
+}
