@@ -1,10 +1,10 @@
 import React from 'react';
 import './Player.css';
 
-const Player = (props) => (props.position ? (
+const Player = (props) => (
   <div
     className="player"
-    style={{ left: `${props.position.x}vw`, top: `${props.position.y}vh` }}
+    style={{ left: `${props.x}vw`, top: `${props.y}vh` }}
   >
     <div className="player__body">
       <div className="player__eye" />
@@ -15,7 +15,7 @@ const Player = (props) => (props.position ? (
       <div className="player__indicator" />
     }
   </div>
-) : null);
+);
 
 export default Player;
 

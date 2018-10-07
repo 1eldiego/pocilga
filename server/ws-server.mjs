@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import websocket from 'websocket';
-import uniqid from 'uniqid';
 import httpServer from './http-server';
 import store from './store';
-import { REGISTER_OWNER } from './constants.mjs';
+import {
+  REGISTER_OWNER,
+  ACTION_TYPE,
+  ACTION_PAYLOAD,
+  CLOSE_OWNER,
+} from './constants.mjs';
 
 const wsServer = new websocket.server({
   httpServer,
@@ -23,11 +27,11 @@ wsServer.on('request', function (request) {
     return;
   }
 
-  const id = uniqid();
+  const id = parseInt(request.resourceURL.query.id, 10);
 
   store.dispatch({
     type: REGISTER_OWNER,
-    payload: request.resourceURL.query.id, // deberia venir desde login (user, pass) => id player
+    payload: id, // deberia venir desde login (user, pass) => id player
   });
 
   const connection = request.accept(null, request.origin);
@@ -40,13 +44,12 @@ wsServer.on('request', function (request) {
 
   connection.on('message', (message) => {
     if (message.type === 'utf8') {
-      console.log('Received Message: ' + message.utf8Data);
-
       const action = JSON.parse(message.utf8Data);
 
-      if (action.type) {
+      if (action[ACTION_TYPE]) {
         store.dispatch({
-          ...action,
+          type: action[ACTION_TYPE],
+          payload: action[ACTION_PAYLOAD],
           id,
         });
       }
@@ -55,6 +58,10 @@ wsServer.on('request', function (request) {
 
   connection.on('close', (reasonCode, description) => {
     console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+    store.dispatch({
+      type: CLOSE_OWNER,
+      payload: id,
+    });
     connectedUsers.delete(id);
   });
 

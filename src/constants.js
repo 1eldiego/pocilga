@@ -1,10 +1,6 @@
 // action types
-export const REGISTER_OWNER = 'R';
-export const CLOSE_OWNER = 'C';
-export const ADD_PLAYER = 'A';
-export const MOVE_PLAYER = 'M';
-export const DELETE_PLAYER = 'D';
 export const UPDATE_STATE = 'U';
+export const MOVE_PLAYER = 'M';
 
 // player data keys
 export const ID = 'D';
@@ -15,16 +11,9 @@ export const CURRENT_PALTA = 'P';
 export const POSITION_X = 'X';
 export const POSITION_Y = 'Y';
 
-// player status
-export const ONLINE = 1;
-export const OFFLINE = 0;
-
 // action keys
 export const ACTION_TYPE = 'T'; 
 export const ACTION_PAYLOAD = 'P';
-
-// server settings
-export const TICK_RATE = 100;
 
 // directions
 export const UP = 'U'; 

@@ -27,6 +27,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "serve": "^10.0.2"
   }
 }

@@ -1,6 +1,24 @@
 import React from 'react';
 import Player from '../Player';
+import {
+  ACTION_TYPE,
+  ACTION_PAYLOAD,
+  UPDATE_STATE,
+  ID,
+  POSITION_X,
+  POSITION_Y,
+  MOVE_PLAYER,
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT
+} from '../constants.js';
 import './Game.css';
+
+const createAction = (type, payload) => ({
+  [ACTION_TYPE]: type,
+  [ACTION_PAYLOAD]: payload,
+});
 
 class Game extends React.Component {
   constructor(props) {
@@ -17,62 +35,22 @@ class Game extends React.Component {
     };
   }
 
-  registerUser(id) {
-    this.setState({
-      user: {
-        id,
-      }
-    });
-  }
+  // registerUser(id) {
+  //   this.setState({
+  //     user: {
+  //       id,
+  //     }
+  //   });
+  // }
 
-  removePlayer(id) {
-    this.setState({
-      players: this.state.players.filter(player => player.id === id),
-    });
-  }
+  // exitPlayer() {
+  //   this.socket.send(JSON.stringify({
+  //     type: 'C',
+  //     payload: this.state.user.id,
+  //   }));
 
-  addNewPlayer(id, x, y) {
-    this.setState({
-      players: [
-        ...this.state.players,
-        {
-          id,
-          myself: id === this.state.user.id,
-          position: {
-            x,
-            y,
-          }
-        },
-      ],
-    });
-  }
-
-  movePlayer(id, x, y) {
-    this.setState({
-      players: this.state.players.map(player => {
-        if (player.id === id) {
-          return {
-            ...player,
-            position: {
-              x,
-              y,
-            },
-          };
-        }
-
-        return player;
-      }),
-    });
-  }
-
-  exitPlayer() {
-    this.socket.send(JSON.stringify({
-      type: 'C',
-      payload: this.state.user.id,
-    }));
-
-    this.socket.close();
-  }
+  //   this.socket.close();
+  // }
 
   connectToServer() {
     this.socket = new WebSocket(`ws://192.168.0.19:8080?id=${this.state.user.id}`);
@@ -80,23 +58,15 @@ class Game extends React.Component {
     this.socket.addEventListener('open', (event) => { });
 
     this.socket.addEventListener('message', (event) => {
-      const msg = JSON.parse(event.data);
+      const action = JSON.parse(event.data);
+      const type = action[ACTION_TYPE];
+      const payload = action[ACTION_PAYLOAD];
 
-      switch (msg.type) {
-        case 'R':
-          this.registerUser(msg.payload);
-          break;
-
-        case 'N':
-          this.addNewPlayer(msg.payload);
-          break;
-
-        case 'M':
-          this.movePlayer(msg.payload.id, msg.payload.x, msg.payload.y);
-          break;
-
-        case 'D':
-          this.removePlayer(msg.payload);
+      switch (type) {
+        case UPDATE_STATE:
+          this.setState({
+            players: payload,
+          });
           break;
 
         default:
@@ -106,32 +76,52 @@ class Game extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener("beforeunload", () => this.exitPlayer());
+    // window.addEventListener("beforeunload", () => this.exitPlayer());
 
     const gameDom = this.gameRef.current;
 
-    gameDom.addEventListener('onkeydown', (event) => {
-      if (event.keycode === 38) {
-        // haz algo :V
+    gameDom.addEventListener('keydown', (event) => {
+      let action;
+
+      switch (event.keyCode) {
+        case 37:
+          action = createAction(MOVE_PLAYER, LEFT);
+          break;
+        case 38:
+          action = createAction(MOVE_PLAYER, UP);
+          break;
+        case 39:
+          action = createAction(MOVE_PLAYER, RIGHT);
+          break;
+        case 40:
+          action = createAction(MOVE_PLAYER, DOWN);
+          break;
+
+        default:
+          break;
+      }
+
+      if (action) {
+        this.socket.send(JSON.stringify(action));
       }
     });
   }
 
   render() {
     return (
-      <section className="game" ref={this.gameRef}>
+      <section className="game" tabIndex="0" ref={this.gameRef}>
         {this.state.players.map(player => (
           <Player
-            key={player.id}
-            name={player.name}
-            myself={player.myself}
-            position={player.position}
+            key={player[ID]}
+            myself={player[ID] === this.state.user.id}
+            x={player[POSITION_X]}
+            y={player[POSITION_Y]}
           />
         ))}
 
         <input onChange={event => this.setState({
           user: {
-            id: event.target.value,
+            id: parseInt(event.target.value, 10),
           }
         })} />
         <button onClick={() => this.connectToServer()}>
