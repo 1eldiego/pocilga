@@ -1,5 +1,5 @@
 // action types
-export const UPDATE_STATE = 'U';
+export const UPDATE_PLAYERS = 2;
 export const MOVE_PLAYER = 'M';
 
 // player data keys

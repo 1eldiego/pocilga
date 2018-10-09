@@ -1,10 +1,10 @@
 // action types
 export const REGISTER_OWNER = 'R';
+export const UPDATE_PLAYERS = 2;
 export const CLOSE_OWNER = 'C';
 export const ADD_PLAYER = 'A';
 export const MOVE_PLAYER = 'M';
 export const DELETE_PLAYER = 'D';
-export const UPDATE_STATE = 'U';
 
 // player data keys
 export const ID = 'D';

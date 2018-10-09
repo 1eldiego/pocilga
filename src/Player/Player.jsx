@@ -14,6 +14,8 @@ const Player = (props) => (
     {props.myself &&
       <div className="player__indicator" />
     }
+
+    {props.hp} / {props.maxhp}
   </div>
 );
 

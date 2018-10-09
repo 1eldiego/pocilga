@@ -3,10 +3,7 @@ import Player from '../Player';
 import {
   ACTION_TYPE,
   ACTION_PAYLOAD,
-  UPDATE_STATE,
-  ID,
-  POSITION_X,
-  POSITION_Y,
+  UPDATE_PLAYERS,
   MOVE_PLAYER,
   UP,
   DOWN,
@@ -53,19 +50,39 @@ class Game extends React.Component {
   // }
 
   connectToServer() {
-    this.socket = new WebSocket(`ws://192.168.0.19:8080?id=${this.state.user.id}`);
+    this.socket = new WebSocket(`ws://localhost:8080?id=${this.state.user.id}`);
+    this.socket.binaryType = 'arraybuffer';
 
     this.socket.addEventListener('open', (event) => { });
 
     this.socket.addEventListener('message', (event) => {
-      const action = JSON.parse(event.data);
-      const type = action[ACTION_TYPE];
-      const payload = action[ACTION_PAYLOAD];
+      const buffer = event.data;
+      const type = new Uint8Array(buffer, 0, 1);
 
-      switch (type) {
-        case UPDATE_STATE:
+      switch (type[0]) {
+        case UPDATE_PLAYERS:
+          const numItems = (buffer.byteLength - 2) / 8;
+          const players = [];
+          
+          for (let index = 0; index < numItems; index += 1) {
+            const offset = (index * 8) + 2;
+
+            const id = new Uint8Array(buffer, offset, 2);
+            const position = new Uint8Array(buffer, offset + 2, 2);
+            const hp = new Uint16Array(buffer, offset + 4, 2);
+
+
+            players.push({
+              id: id[0],
+              x: position[0],
+              y: position[1],
+              maxhp: hp[0],
+              hp: hp[1],
+            });
+          }
+
           this.setState({
-            players: payload,
+            players,
           });
           break;
 
@@ -112,10 +129,12 @@ class Game extends React.Component {
       <section className="game" tabIndex="0" ref={this.gameRef}>
         {this.state.players.map(player => (
           <Player
-            key={player[ID]}
-            myself={player[ID] === this.state.user.id}
-            x={player[POSITION_X]}
-            y={player[POSITION_Y]}
+            key={player.id}
+            myself={player.id === this.state.user.id}
+            hp={player.hp}
+            maxhp={player.maxhp}
+            x={player.x}
+            y={player.y}
           />
         ))}
 

@@ -39,7 +39,8 @@ wsServer.on('request', function (request) {
 
   const user = {
     id,
-    send: message => connection.sendUTF(JSON.stringify(message)),
+    sendText: message => connection.sendUTF(JSON.stringify(message)),
+    sendData: buffer => connection.sendBytes(Buffer.from(buffer)),
   };
 
   connection.on('message', (message) => {

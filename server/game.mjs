@@ -2,22 +2,40 @@
 import connectedUsers from './ws-server';
 import store from './store';
 import {
-  UPDATE_STATE,
-  ACTION_TYPE,
-  ACTION_PAYLOAD,
+  UPDATE_PLAYERS,
   ONLINE,
-  ID,
-  MAX_VIDA,
-  CURRENT_VIDA,
-  POSITION_X,
-  POSITION_Y,
   TICK_RATE,
 } from './constants.mjs';
 
-const createAction = (type, payload) => ({
-  type,
-  payload,
-});
+const lastData = new Map();
+
+const updateDataToBin = (data = []) => {
+  const bytesRequired = (data.size * 8) + 2;
+  const buffer = new ArrayBuffer(bytesRequired);
+  const head = new Uint8Array(buffer, 0, 1);
+
+  head[0] = UPDATE_PLAYERS;
+
+  let index = 0;
+
+  data.forEach((entity) => {
+    const offset = (index * 8) + 2;
+
+    const id = new Uint8Array(buffer, offset, 2);
+    const position = new Uint8Array(buffer, offset + 2, 2);
+    const hp = new Uint16Array(buffer, offset + 4, 2);
+
+    id[0] = entity.id;
+    position[0] = entity.x;
+    position[1] = entity.y;
+    hp[0] = entity.maxhp;
+    hp[1] = entity.hp;
+
+    index += 1;
+  });
+
+  return buffer;
+};
 
 // game loop
 setInterval(() => {
@@ -45,21 +63,18 @@ setInterval(() => {
     connectedUsers.forEach((user) => {
       const userMap = mapPlayers.get(user.id);
       const playersData = playersInMaps.get(userMap);
-      const parsedData = [];
+      const buffer = updateDataToBin(playersData);
+      const stringBuffer = String(new Uint8Array(buffer));
 
-      playersData.forEach((data) => {
-        parsedData.push({
-          [ID]: data.id,
-          [MAX_VIDA]: data.maxhp,
-          [CURRENT_VIDA]: data.hp,
-          // [MAX_PALTA]: data.maxmp,
-          // [CURRENT_PALTA]: data.mp, // deberian ir como data personal
-          [POSITION_X]: data.x,
-          [POSITION_Y]: data.y,
-        });
-      });
+      const myLastData = lastData.get(user.id);
 
-      user.send({ [ACTION_TYPE]: UPDATE_STATE, [ACTION_PAYLOAD]: parsedData });
+      if (!myLastData ||
+        (myLastData && myLastData !== stringBuffer)
+      ) {
+        user.sendData(buffer);
+      }
+
+      lastData.set(user.id, stringBuffer);
     });
   }
 }, TICK_RATE);
