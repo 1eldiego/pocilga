@@ -1,6 +1,6 @@
 // action types
 export const UPDATE_PLAYERS = 2;
-export const MOVE_PLAYER = 'M';
+export const MOVE_PLAYER = 3;
 
 // player data keys
 export const ID = 'D';
@@ -16,7 +16,7 @@ export const ACTION_TYPE = 'T';
 export const ACTION_PAYLOAD = 'P';
 
 // directions
-export const UP = 'U'; 
-export const DOWN = 'D'; 
-export const LEFT = 'L'; 
-export const RIGHT = 'R'; 
+export const UP = 1; 
+export const DOWN = 2; 
+export const LEFT = 3; 
+export const RIGHT = 4; 

@@ -44,13 +44,17 @@ wsServer.on('request', function (request) {
   };
 
   connection.on('message', (message) => {
-    if (message.type === 'utf8') {
-      const action = JSON.parse(message.utf8Data);
+    if (message.type === 'binary') {
+      const buffer = message.binaryData;
+      const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+      const view = new DataView(arrayBuffer);
+      const type = view.getUint8(0);
+      const payload = view.getUint8(1);
 
-      if (action[ACTION_TYPE]) {
+      if (type) {
         store.dispatch({
-          type: action[ACTION_TYPE],
-          payload: action[ACTION_PAYLOAD],
+          type,
+          payload,
           id,
         });
       }
@@ -63,7 +67,8 @@ wsServer.on('request', function (request) {
       type: CLOSE_OWNER,
       payload: id,
     });
-    connectedUsers.delete(id);
+
+    connectedUsers.delete(user);
   });
 
   connectedUsers.add(user);

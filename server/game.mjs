@@ -7,35 +7,32 @@ import {
   TICK_RATE,
 } from './constants.mjs';
 
-const lastData = new Map();
 
 const updateDataToBin = (data = []) => {
-  const bytesRequired = (data.size * 8) + 2;
+  const bytesRequired = (data.size * 7) + 1;
   const buffer = new ArrayBuffer(bytesRequired);
-  const head = new Uint8Array(buffer, 0, 1);
-
-  head[0] = UPDATE_PLAYERS;
-
+  const view = new DataView(buffer);
+  
+  view.setUint8(0, UPDATE_PLAYERS);
+  
   let index = 0;
-
+  
   data.forEach((entity) => {
-    const offset = (index * 8) + 2;
-
-    const id = new Uint8Array(buffer, offset, 2);
-    const position = new Uint8Array(buffer, offset + 2, 2);
-    const hp = new Uint16Array(buffer, offset + 4, 2);
-
-    id[0] = entity.id;
-    position[0] = entity.x;
-    position[1] = entity.y;
-    hp[0] = entity.maxhp;
-    hp[1] = entity.hp;
-
+    const offset = (index * 7) + 1;
+    
+    view.setUint8(offset, entity.id);
+    view.setUint8(offset + 1, entity.x);
+    view.setUint8(offset + 2, entity.y);
+    view.setUint16(offset + 3, entity.maxhp);
+    view.setUint16(offset + 5, entity.hp);
+    
     index += 1;
   });
-
+  
   return buffer;
 };
+
+const lastData = new Map();
 
 // game loop
 setInterval(() => {
@@ -65,9 +62,9 @@ setInterval(() => {
       const playersData = playersInMaps.get(userMap);
       const buffer = updateDataToBin(playersData);
       const stringBuffer = String(new Uint8Array(buffer));
-
+      
       const myLastData = lastData.get(user.id);
-
+      
       if (!myLastData ||
         (myLastData && myLastData !== stringBuffer)
       ) {

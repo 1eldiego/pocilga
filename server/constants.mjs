@@ -1,10 +1,8 @@
 // action types
-export const REGISTER_OWNER = 'R';
+export const REGISTER_OWNER = 1;
 export const UPDATE_PLAYERS = 2;
-export const CLOSE_OWNER = 'C';
-export const ADD_PLAYER = 'A';
-export const MOVE_PLAYER = 'M';
-export const DELETE_PLAYER = 'D';
+export const MOVE_PLAYER = 3;
+export const CLOSE_OWNER = 4;
 
 // player data keys
 export const ID = 'D';
@@ -27,7 +25,7 @@ export const ACTION_PAYLOAD = 'P';
 export const TICK_RATE = 100;
 
 // directions
-export const UP = 'U'; 
-export const DOWN = 'D'; 
-export const LEFT = 'L'; 
-export const RIGHT = 'R'; 
+export const UP = 1; 
+export const DOWN = 2; 
+export const LEFT = 3; 
+export const RIGHT = 4; 

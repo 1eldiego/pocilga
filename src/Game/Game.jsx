@@ -1,8 +1,6 @@
 import React from 'react';
 import Player from '../Player';
 import {
-  ACTION_TYPE,
-  ACTION_PAYLOAD,
   UPDATE_PLAYERS,
   MOVE_PLAYER,
   UP,
@@ -11,11 +9,6 @@ import {
   RIGHT
 } from '../constants.js';
 import './Game.css';
-
-const createAction = (type, payload) => ({
-  [ACTION_TYPE]: type,
-  [ACTION_PAYLOAD]: payload,
-});
 
 class Game extends React.Component {
   constructor(props) {
@@ -57,27 +50,23 @@ class Game extends React.Component {
 
     this.socket.addEventListener('message', (event) => {
       const buffer = event.data;
-      const type = new Uint8Array(buffer, 0, 1);
+      const view = new DataView(buffer);
+      const type = view.getUint8(0);
 
-      switch (type[0]) {
+      switch (type) {
         case UPDATE_PLAYERS:
-          const numItems = (buffer.byteLength - 2) / 8;
+          const numItems = (buffer.byteLength - 1) / 7;
           const players = [];
-          
+
           for (let index = 0; index < numItems; index += 1) {
-            const offset = (index * 8) + 2;
-
-            const id = new Uint8Array(buffer, offset, 2);
-            const position = new Uint8Array(buffer, offset + 2, 2);
-            const hp = new Uint16Array(buffer, offset + 4, 2);
-
+            const offset = (index * 7) + 1;
 
             players.push({
-              id: id[0],
-              x: position[0],
-              y: position[1],
-              maxhp: hp[0],
-              hp: hp[1],
+              id: view.getUint8(offset),
+              x: view.getUint8(offset + 1),
+              y: view.getUint8(offset + 2),
+              maxhp: view.getUint16(offset + 3),
+              hp: view.getUint16(offset + 5),
             });
           }
 
@@ -98,28 +87,37 @@ class Game extends React.Component {
     const gameDom = this.gameRef.current;
 
     gameDom.addEventListener('keydown', (event) => {
-      let action;
+      let payload;
+      let type;
 
       switch (event.keyCode) {
         case 37:
-          action = createAction(MOVE_PLAYER, LEFT);
+          type = MOVE_PLAYER;
+          payload = LEFT;
           break;
         case 38:
-          action = createAction(MOVE_PLAYER, UP);
+          type = MOVE_PLAYER;
+          payload = UP;
           break;
         case 39:
-          action = createAction(MOVE_PLAYER, RIGHT);
+          type = MOVE_PLAYER;
+          payload = RIGHT;
           break;
         case 40:
-          action = createAction(MOVE_PLAYER, DOWN);
+          type = MOVE_PLAYER;
+          payload = DOWN;
           break;
 
         default:
           break;
       }
 
-      if (action) {
-        this.socket.send(JSON.stringify(action));
+      if (type) {
+        const buffer = new ArrayBuffer(2);
+        const view = new DataView(buffer);
+        view.setUint8(0, type);
+        view.setUint8(1, payload);
+        this.socket.send(buffer);
       }
     });
   }
