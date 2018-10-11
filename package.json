@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "phaser": "^3.14.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-redux": "^5.0.7",
     "react-scripts": "2.0.3",
     "redux": "^4.0.0",
-    "uniqid": "^5.0.3",
     "websocket": "^1.0.28"
   },
   "scripts": {
@@ -15,7 +16,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "npx nodemon -- --experimental-modules server/game.mjs"
+    "server": "npx nodemon -- --experimental-modules src/server/game.mjs"
   },
   "eslintConfig": {
     "extends": "react-app"

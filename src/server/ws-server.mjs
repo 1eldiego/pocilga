@@ -4,8 +4,6 @@ import httpServer from './http-server';
 import store from './store';
 import {
   REGISTER_OWNER,
-  ACTION_TYPE,
-  ACTION_PAYLOAD,
   CLOSE_OWNER,
 } from './constants.mjs';
 

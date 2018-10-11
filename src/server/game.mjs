@@ -7,7 +7,6 @@ import {
   TICK_RATE,
 } from './constants.mjs';
 
-
 const updateDataToBin = (data = []) => {
   const bytesRequired = (data.size * 7) + 1;
   const buffer = new ArrayBuffer(bytesRequired);
