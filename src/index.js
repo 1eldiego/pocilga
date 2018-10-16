@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import { Provider } from "react-redux";
 import store from "./client/store";
 import './index.css';
-import Game from './client/Game';
+import Main from './client/Main';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <Provider store={store}>
-    <Game />
+    <Main />
   </Provider>,
   document.getElementById('root')
 );

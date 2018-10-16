@@ -1,9 +1,14 @@
 import store from './store';
 import { getBinaryAction } from './binary';
+import { CONNECT_USER } from './constants';
 
 let socket;
 
-const onOpen = (event) => { };
+const onOpen = (event) => {
+  store.dispatch({
+    type: CONNECT_USER,
+  });
+};
 
 const onMessage = (event) => {
   const action = getBinaryAction(event.data);

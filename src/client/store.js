@@ -1,5 +1,5 @@
 import { createStore } from 'redux';
-import { UPDATE_PLAYERS } from './constants';
+import { UPDATE_PLAYERS, CONNECT_USER, ONLINE, OFFLINE } from './constants';
 import { parseBinaryPlayers } from './binary';
 
 const initialState = {
@@ -7,6 +7,7 @@ const initialState = {
   monsters: [],
   chat: [],
   user: {
+    status: OFFLINE,
     id: null,
   }
 };
@@ -18,6 +19,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         players,
+      };
+    }
+
+    case CONNECT_USER: {
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          status: ONLINE,
+        },
       };
     }
 

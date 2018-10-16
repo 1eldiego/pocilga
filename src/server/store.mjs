@@ -22,8 +22,8 @@ const initialState = {
       maxmp: 500,
       hp: 100,
       mp: 350,
-      x: 21,
-      y: 45,
+      x: 12,
+      y: 3,
     }],
     [2, {
       id: 2,
@@ -32,8 +32,8 @@ const initialState = {
       maxmp: 100,
       hp: 250,
       mp: 100,
-      x: 50,
-      y: 2,
+      x: 2,
+      y: 7,
     }]
   ]),
   maps: new Map([

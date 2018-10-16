@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
-import Game from './Game';
+import Main from './Main';
 
 const mapStateToProps = (state) => ({
-  game: state,
+  user: state.user,
 });
 
 // const mapDispatchToProps = () => {};
@@ -10,4 +10,4 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   // mapDispatchToProps
-)(Game);
+)(Main);
